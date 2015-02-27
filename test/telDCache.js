@@ -14,9 +14,8 @@ describe('Given I have a module to cache data', function() {
     });
 
     describe('When I inspect the cache module', function() {
-      var hasInsert = _.has(telDCache, 'insert');
-
       it('Should have an insert function', function() {
+        var hasInsert = _.has(telDCache, 'insert');
 
         expect(hasInsert).to.equal(true);
       });
