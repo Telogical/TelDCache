@@ -1,0 +1,52 @@
+{
+  "name": "TelDCache",
+  "version": "0.0.1",
+  "description": "A durable caching implementation built upon TelQ and Redis (current implementation).",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Telogical/TelDCache"
+  },
+  "contributors": [
+    {
+      "name": "Joe Hare",
+      "email": "joseph.hare@gmail.com",
+      "url": "http://joehare.org"
+    },
+    {
+      "name": "Chris Gibson",
+      "email": "chris.david.gibson@gmail.com",
+      "url": "http://github.com/chris-gibson"
+    }
+  ],
+  "keywords": [
+    "cache",
+    "durable",
+    "kvs"
+  ],
+  "author": "Telogical Systems",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Telogical/TelDCache/issues"
+  },
+  "homepage": "https://github.com/Telogical/TelDCache",
+  "peerDependencies": {
+    "redis": "0.x.x"
+  },
+  "dependencies": {
+    "gulp": "^3.8.11",
+    "lodash": "^3.3.1"
+  },
+  "devDependencies": {
+    "chai": "^2.1.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-jshint": "^1.9.2",
+    "gulp-mocha": "^2.0.0",
+    "gulp-sourcemaps": "^1.5.0",
+    "gulp-uglify": "^1.1.0",
+    "jshint-stylish": "^1.0.1"
+  }
+}
