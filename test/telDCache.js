@@ -11,8 +11,11 @@ var expect = chai.expect;
 var _ = require('lodash');
 
 var EventEmitter = require('events').EventEmitter;
-var emitter = new EventEmitter;
+var emitter = new EventEmitter();
+var stubEventHandler;
 
+// If these tests fail due to timeout you may need to adjust the setTimeout
+// calls made in the beforeEach()s that use it.
 describe('Given I have a module to cache data', function() {
   var TelDCache = require('./../index.js');
   var telDCache;
@@ -20,6 +23,13 @@ describe('Given I have a module to cache data', function() {
   describe('And I have instantiated it', function() {
     before(function() {
       telDCache = new TelDCache();
+
+      stubEventHandler = {
+        'on': function handleCallback(eve, cb) {
+          emitter.on(eve, cb);
+        }
+      };
+
     });
 
     describe('When I inspect the cache module', function() {
@@ -36,13 +46,57 @@ describe('Given I have a module to cache data', function() {
       });
     });
 
-    describe('And I can successfully connect to the cache', function() {
-      beforeEach(function() {
-        function emitConnected() {
-          emitter.emit('connect');
-        }
+    describe('And I successfully connect to the cache', function() {
 
-        sinon.stub(redis, 'createClient', emitConnected);
+      beforeEach(function() {
+        sinon.stub(redis, 'createClient', function stubCreateClientSuccess() {
+          setTimeout(function() {
+            emitter.emit('ready');
+          }, 250);
+          return stubEventHandler;
+        });
+      });
+
+      afterEach(function() {
+        redis.createClient.restore();
+      });
+
+      describe('When I initialize the cache skittles', function () {
+
+        var connection; 
+
+        beforeEach(function() {
+          var options = {
+            host: 'someHost',
+            port: 'somePort'
+          };
+
+          connection = telDCache.init(options);
+        });
+
+        it('Should return with a successful connection message', function(done) {
+          expect(connection)
+            .to.eventually.have.property('connected')
+            .and.equal(true);
+
+          expect(connection).to.eventually.be.fulfilled.and.notify(done);
+        });
+      });
+    });
+
+    describe('And I unsuccessfully connect to the cache', function() {
+      var errorObject = {
+        'message': 'Loose butthole'
+      };
+
+      beforeEach(function() {
+
+        sinon.stub(redis, 'createClient', function stubCreateClientError() {
+          setTimeout(function() {
+            emitter.emit('error', errorObject);
+          }, 250);
+          return stubEventHandler;
+        });
       });
 
       afterEach(function() {
@@ -60,16 +114,19 @@ describe('Given I have a module to cache data', function() {
           };
 
           connection = telDCache.init(options);
+
         });
 
-        it('Should return with a successful connection message', function(done) {
-          var expectedConnection = {
-            connected: true
-          };
+        it('Should return with a unsuccessful connection message', function(done) {
+          expect(connection)
+            .to.eventually.have.property('connected')
+            .and.equal(false);
 
-          expect(connection).to.eventually.deep.equal(expectedConnection).and.notify(done);
+          expect(connection).to.eventually.be.rejected.and.notify(done);
         });
+
       });
     });
+
   });
 });
