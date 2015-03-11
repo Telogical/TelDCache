@@ -12,7 +12,7 @@ var _ = require('lodash');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
-var stubEventHandler;
+var stubRedisClient;
 
 // If these tests fail due to timeout you may need to adjust the setTimeout
 // calls made in the beforeEach()s that use it.
@@ -24,7 +24,7 @@ describe('Given I have a module to cache data', function() {
     before(function() {
       telDCache = new TelDCache();
 
-      stubEventHandler = {
+      stubRedisClient = {
         'on': function handleCallback(eve, cb) {
           emitter.on(eve, cb);
         }
@@ -33,11 +33,6 @@ describe('Given I have a module to cache data', function() {
     });
 
     describe('When I inspect the cache module', function() {
-      it('Should have an insert function', function() {
-        var hasInsert = _.has(telDCache, 'insert');
-
-        expect(hasInsert).to.equal(true);
-      });
 
       it('Should have an init function', function() {
         var hasInit = _.has(telDCache, 'init');
@@ -53,7 +48,7 @@ describe('Given I have a module to cache data', function() {
           setTimeout(function() {
             emitter.emit('ready');
           }, 250);
-          return stubEventHandler;
+          return stubRedisClient;
         });
       });
 
@@ -95,7 +90,7 @@ describe('Given I have a module to cache data', function() {
           setTimeout(function() {
             emitter.emit('error', errorObject);
           }, 250);
-          return stubEventHandler;
+          return stubRedisClient;
         });
       });
 
