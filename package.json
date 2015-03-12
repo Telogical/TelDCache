@@ -2,6 +2,7 @@
   "name": "TelDCache",
   "version": "0.0.1",
   "description": "A durable caching implementation built upon TelQ and Redis (current implementation).",
+  "repository": "https://github.com/Telogical/TelDCache",
   "main": "index.js",
   "scripts": {
     "test": "gulp test"
