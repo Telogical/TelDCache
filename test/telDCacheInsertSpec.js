@@ -13,7 +13,9 @@ var q = require('@telogical/telq');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
-var stubRedisClient;
+
+var StubRedisClient = require('./mocks/stubRedisClient');;
+var stubRedisClient = new StubRedisClient(emitter);
 
 // If these tests fail due to timeout you may need to adjust the setTimeout
 // calls made in the beforeEach()s that use it.
@@ -24,22 +26,6 @@ describe('Given I have a module to cache data', function() {
   describe('And I have instantiated it', function() {
     before(function() {
       telDCache = new TelDCache();
-
-      stubRedisClient = {
-        'on': function handleCallback(eve, cb) {
-          emitter.on(eve, cb);
-        },
-        'set': function clientSetStub(key, value) {
-          if(typeof value === 'string') {
-            return 'OK';
-          }
-
-          if(typeof value === 'object') {
-            return 0;
-          }
-        }
-      };
-
     });
     
     describe('When I inspect the module', function() {
@@ -91,6 +77,11 @@ describe('Given I have a module to cache data', function() {
         }
       };
 
+      var options = {
+        host: 'someHost',
+        port: 'somePort'
+      };
+
       beforeEach(function() {
         sinon.stub(redis, 'createClient', function stubCreateClientSuccess() {
           setTimeout(function() {
@@ -99,12 +90,11 @@ describe('Given I have a module to cache data', function() {
           return stubRedisClient;
         });
 
-        initPromise = telDCache.init();
+        initPromise = telDCache.init(options);
       });
 
       afterEach(function() {
         redis.createClient.restore();
-        redis.set.restore();
       });
 
       describe('When I insert a string to the cache', function() {

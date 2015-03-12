@@ -12,7 +12,9 @@ var _ = require('lodash');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
-var stubRedisClient;
+
+var StubRedisClient = require('./mocks/stubRedisClient');;
+var stubRedisClient = new StubRedisClient(emitter);
 
 // If these tests fail due to timeout you may need to adjust the setTimeout
 // calls made in the beforeEach()s that use it.
@@ -23,13 +25,6 @@ describe('Given I have a module to cache data', function() {
   describe('And I have instantiated it', function() {
     before(function() {
       telDCache = new TelDCache();
-
-      stubRedisClient = {
-        'on': function handleCallback(eve, cb) {
-          emitter.on(eve, cb);
-        }
-      };
-
     });
 
     describe('When I inspect the cache module', function() {
