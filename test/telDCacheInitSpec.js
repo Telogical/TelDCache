@@ -65,11 +65,16 @@ describe('Given I have a module to cache data', function() {
         });
 
         it('Should return with a successful connection message', function(done) {
-          expect(connection)
-            .to.eventually.have.property('connected')
-            .and.equal(true);
+          function success(data) {
+            expect(data.connected).to.equal(true);
+            done();
+          }
 
-          expect(connection).to.eventually.be.fulfilled.and.notify(done);
+          function failure() {
+            expect(true).to.equal(false);
+          }
+
+          connection.then(success, failure).catch(done);
         });
       });
     });
@@ -108,11 +113,17 @@ describe('Given I have a module to cache data', function() {
         });
 
         it('Should return with a unsuccessful connection message', function(done) {
-          expect(connection)
-            .to.eventually.have.property('connected')
-            .and.equal(false);
+          function success() {
+            expect(true).to.equal(false);
+            done();
+          }
 
-          expect(connection).to.eventually.be.rejected.and.notify(done);
+          function failure(err) {
+            expect(err.connected).to.equal(false);
+            done();
+          }
+
+          connection.then(success, failure).catch(done);
         });
 
       });
