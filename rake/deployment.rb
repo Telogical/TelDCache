@@ -35,7 +35,7 @@ module Deployment
     def self.ci
       puts "Gulp build #{File.dirname(__FILE__)}"
       Dir.chdir "#{File.dirname(__FILE__)}/../" do
-      %x(gulp build --production)
+      %x(gulp ci)
       end
     end
   end
