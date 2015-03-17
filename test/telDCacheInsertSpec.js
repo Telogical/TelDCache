@@ -91,29 +91,19 @@ describe('Given I have a module to cache data', function() {
         beforeEach(function() {
           telDCache._state.connected = true;
           insertPromise = telDCache.insert(testData.key, testData.value);
-
-          /*
-          insertPromise.then(
-            function success(data) {
-            },
-
-            function fail(err) {
-            }
-          );
-          */
         });
 
-        xit('Should resolve with the key that was set', function(done) {
-          expect(insertPromise).to.eventually.equal(testData.key);
-          expect(insertPromise).to.eventually.be.fulfilled.and.notify(done);
-          insertPromise.then(
-            function success(data) {
-              expect(data).to.equal('OK');
-              done();
-            },
-            function fail(err) {
-            }
-          );
+        it('Should resolve with the key that was set', function(done) {
+          function success(data) {
+            expect(data).to.equal('myTestKey');
+            done();
+          }
+
+          function fail(err) {
+            expect(true).to.equal(false);
+          }
+
+          insertPromise.then(success, fail).catch(done);
         });
 
       });
