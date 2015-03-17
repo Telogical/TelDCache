@@ -132,7 +132,7 @@ describe('Given I have a module to cache data', function() {
           ];
 
           function success(returnedKeys) {
-            expect('asdf').to.deep.equal(expectedKeys);
+            expect(returnedKeys).to.deep.equal(expectedKeys);
             done();
           }
 
