@@ -1,3 +1,5 @@
+require 'shell'
+
 module Deployment
 
   class GemModules
@@ -35,7 +37,7 @@ module Deployment
     def self.ci
       puts "Gulp build #{File.dirname(__FILE__)}"
       Dir.chdir "#{File.dirname(__FILE__)}/../" do
-      %x(gulp ci)
+      shell::sh "gulp ci"
       end
     end
   end

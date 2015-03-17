@@ -1,5 +1,3 @@
-require_relative 'rake/deployment'
-
 namespace :build do
   task :production do
     build
@@ -12,9 +10,9 @@ namespace :build do
   private
 
   def build
-    Deployment::GemModules.install
-    Deployment::NodeModules.clean_install ""
-    Deployment::Gulp.ci
+    sh "bundle install"
+    sh "npm install"
+    sh "gulp ci"
   end
 
 end
