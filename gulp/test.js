@@ -7,6 +7,7 @@ var mocha = require('gulp-mocha');
 function handleError(error) {
   // "Pepsi bottle; Coca-Cola gloss [sic: glass] - I don't give a _damn_."
   console.log('There was an error', error);
+  process.exit(1);
 }
 
 function runUnitTests() {
