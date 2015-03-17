@@ -1,0 +1,20 @@
+require_relative 'rake/deployment'
+
+namespace :build do
+  task :production do
+    build
+  end
+  
+  task :stability do
+    build
+  end
+
+  private
+
+  def build
+    Deployment::GemModules.install
+    Deployment::NodeModules.clean_install ""
+    Deployment::Gulp.ci
+  end
+
+end
