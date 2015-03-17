@@ -44,14 +44,17 @@
     "redis": "^0.12.1"
   },
   "devDependencies": {
+    "chalk": "*",
     "chai": "^2.1.0",
     "chai-as-promised": "^4.3.0",
     "gulp-concat": "^2.5.2",
     "gulp-jshint": "^1.9.2",
     "gulp-mocha": "^2.0.0",
+    "gulp-plato": "^1.0.0",
     "gulp-sourcemaps": "^1.5.0",
     "gulp-uglify": "^1.1.0",
     "jshint-stylish": "^1.0.1",
+    "run-sequence": "0.3.x",
     "sinon": "^1.13.0"
   }
 }

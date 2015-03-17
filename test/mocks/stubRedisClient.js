@@ -6,19 +6,18 @@ function StubRedisClient(emitter) {
     this._emitter.on(eve, cb);
   }
 
-  function set(key, value) {
-    if(typeof value === 'string') {
-      return 'OK';
-    }
+  function set(key, value, cb) {
+    cb(null, 'OK');
+  }
 
-    if(typeof value === 'object') {
-      return 0;
-    }
+  function hset(key, object, cb) {
+    cb(null, 0);
   }
 
   this._emitter = emitter;
   this.on = on;
   this.set = set;
+  this.hset = hset;
 }
 
 module.exports = StubRedisClient;

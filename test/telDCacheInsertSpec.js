@@ -17,6 +17,7 @@ var emitter = new EventEmitter();
 var StubRedisClient = require('./mocks/stubRedisClient');;
 var stubRedisClient = new StubRedisClient(emitter);
 
+
 // If these tests fail due to timeout you may need to adjust the setTimeout
 // calls made in the beforeEach()s that use it.
 describe('Given I have a module to cache data', function() {
@@ -25,7 +26,12 @@ describe('Given I have a module to cache data', function() {
 
   describe('And I have instantiated it', function() {
     before(function() {
+      sinon.stub(redis, 'createClient').returns(stubRedisClient);
       telDCache = new TelDCache();
+    });
+
+    after(function() {
+      redis.createClient.restore();
     });
     
     describe('When I inspect the module', function() {
@@ -71,7 +77,7 @@ describe('Given I have a module to cache data', function() {
         'value': 'myTestValue'
       }
 
-      var testHashdata = {
+      var testHashData = {
         'key': 'myHash',
         'value': {
           'key1': 'value1',
@@ -89,6 +95,7 @@ describe('Given I have a module to cache data', function() {
         var insertPromise;
 
         beforeEach(function() {
+          telDCache.init(options);
           telDCache._state.connected = true;
           insertPromise = telDCache.insert(testData.key, testData.value);
         });
@@ -99,23 +106,44 @@ describe('Given I have a module to cache data', function() {
             done();
           }
 
-          function fail(err) {
+          function failure(err) {
             expect(true).to.equal(false);
           }
 
-          insertPromise.then(success, fail).catch(done);
+          insertPromise.then(success, failure).catch(done);
         });
 
       });
 
-      /*
       describe('When I insert an object to the cache', function() {
+        var insertPromise;
+
+        beforeEach(function() {
+          telDCache.init(options);
+          telDCache._state.connected = true;
+          insertPromise = telDCache.insert(testHashData.key, testHashData.value);
+        });
+
         it('Should resolve with the keys that were set', function(done) {
-          expect(true).to.equal(false);
-          done();
+          var expectedKeys = [
+            'key1',
+            'key2',
+            'key3'
+          ];
+
+          function success(returnedKeys) {
+            expect(returnedKeys).to.deep.equal(expectedKeys);
+            done();
+          }
+
+          function failure() {
+            expect(true).to.equal(false);
+          }
+
+          insertPromise.then(success, failure).catch(done);
         });
       });
-     */
+
     });
 
   });
