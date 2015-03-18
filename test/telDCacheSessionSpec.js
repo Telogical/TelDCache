@@ -29,8 +29,8 @@ describe('Given I have a module to cache data', function() {
 
     describe('When I inspect the cache module', function() {
 
-      it('Should have an init function', function() {
-        var hasInit = _.has(telDCache, 'init');
+      it('Should have a connect function', function() {
+        var hasInit = _.has(telDCache, 'connect');
 
         expect(hasInit).to.equal(true);
       });
@@ -57,7 +57,7 @@ describe('Given I have a module to cache data', function() {
         redis.createClient.restore();
       });
 
-      describe('And I initialize the cache', function () {
+      describe('And I connect to the cache', function () {
 
         var connection; 
 
@@ -67,7 +67,7 @@ describe('Given I have a module to cache data', function() {
             port: 'somePort'
           };
 
-          connection = telDCache.init(options);
+          connection = telDCache.connect(options);
         });
 
         describe('When I examine the state', function() {

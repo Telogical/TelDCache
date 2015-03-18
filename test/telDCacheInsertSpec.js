@@ -95,7 +95,7 @@ describe('Given I have a module to cache data', function() {
         var insertPromise;
 
         beforeEach(function() {
-          telDCache.init(options);
+          telDCache.connect(options);
           telDCache._state.connected = true;
           insertPromise = telDCache.insert(testData.key, testData.value);
         });
@@ -119,7 +119,7 @@ describe('Given I have a module to cache data', function() {
         var insertPromise;
 
         beforeEach(function() {
-          telDCache.init(options);
+          telDCache.connect(options);
           telDCache._state.connected = true;
           insertPromise = telDCache.insert(testHashData.key, testHashData.value);
         });
