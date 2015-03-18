@@ -14,10 +14,15 @@ function StubRedisClient(emitter) {
     cb(null, 0);
   }
 
+  function end() {
+    this._emitter.emit('end');
+  }
+
   this._emitter = emitter;
   this.on = on;
   this.set = set;
   this.hset = hset;
+  this.end = end;
 }
 
 module.exports = StubRedisClient;

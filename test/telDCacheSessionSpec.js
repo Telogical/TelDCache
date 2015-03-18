@@ -34,6 +34,12 @@ describe('Given I have a module to cache data', function() {
 
         expect(hasInit).to.equal(true);
       });
+
+      it('Should have a disconnect function', function() {
+        var hasDisconnect = _.has(telDCache, 'disconnect');
+
+        expect(hasDisconnect).to.equal(true);
+      });
     });
 
     describe('And I successfully connect to the cache', function() {
@@ -51,7 +57,7 @@ describe('Given I have a module to cache data', function() {
         redis.createClient.restore();
       });
 
-      describe('When I initialize the cache skittles', function () {
+      describe('And I initialize the cache', function () {
 
         var connection; 
 
@@ -64,68 +70,45 @@ describe('Given I have a module to cache data', function() {
           connection = telDCache.init(options);
         });
 
-        it('Should return with a successful connection message', function(done) {
-          function success(data) {
-            expect(data.connected).to.equal(true);
-            done();
-          }
+        describe('When I examine the state', function() {
 
-          function failure() {
-            expect(true).to.equal(false);
-          }
+          it('Should return with a successful connection message', function(done) {
+            function success(data) {
+              expect(data.connected).to.equal(true);
+              done();
+            }
 
-          connection.then(success, failure).catch(done);
-        });
-      });
-    });
+            function failure() {
+              expect(true).to.equal(false);
+            }
 
-    describe('And I unsuccessfully connect to the cache', function() {
-      var errorObject = {
-        'message': 'Loose butthole'
-      };
-
-      beforeEach(function() {
-
-        sinon.stub(redis, 'createClient', function stubCreateClientError() {
-          setTimeout(function() {
-            emitter.emit('error', errorObject);
-          }, 250);
-          return stubRedisClient;
-        });
-      });
-
-      afterEach(function() {
-        redis.createClient.restore();
-      });
-
-      describe('When I initialize the cache', function () {
-
-        var connection; 
-
-        beforeEach(function() {
-          var options = {
-            host: 'someHost',
-            port: 'somePort'
-          };
-
-          connection = telDCache.init(options);
-
+            connection.then(success, failure).catch(done);
+          });
         });
 
-        it('Should return with a unsuccessful connection message', function(done) {
-          function success() {
-            expect(true).to.equal(false);
-            done();
-          }
+        describe('And I disconnect the cache session', function() {
 
-          function failure(err) {
-            expect(err.connected).to.equal(false);
-            done();
-          }
+          var closePromise;
 
-          connection.then(success, failure).catch(done);
+          beforeEach(function() {
+            closePromise = connection.then(telDCache.disconnect);
+          });
+
+          it('Should return with a successful disconnect message rabbits', function(done) {
+
+            function success(data) {
+              expect(data.connected).to.equal(false);
+              done();
+            }
+
+            function failure() {
+              console.log('shit');
+              expect(true).to.equal(false);
+            }
+
+            closePromise.then(success, failure).catch(done);
+          });
         });
-
       });
     });
 
