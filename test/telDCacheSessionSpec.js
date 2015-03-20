@@ -42,7 +42,9 @@ describe('Given I have a module to cache data', function() {
       });
     });
 
-    describe('And I successfully connect to the cache', function() {
+    describe('And I connect to the secured cache with a correct password', function () {
+
+      var connection; 
 
       beforeEach(function() {
         sinon.stub(redis, 'createClient', function stubCreateClientSuccess() {
@@ -51,66 +53,135 @@ describe('Given I have a module to cache data', function() {
           }, 250);
           return stubRedisClient;
         });
+
+        var options = {
+          host: 'someHost',
+          port: 'somePort',
+          // make sure to never set this password to the real local development 
+          // redis's password. If something happens to the mocks and you end
+          // up connecting to it then the tests won't mean anything.
+          password: 'thisisavalidpassword'
+        };
+
+        connection = telDCache.connect(options);
       });
 
       afterEach(function() {
         redis.createClient.restore();
       });
 
-      describe('And I connect to the cache', function () {
 
-        var connection; 
+      describe('When I examine the state', function() {
 
-        beforeEach(function() {
-          var options = {
-            host: 'someHost',
-            port: 'somePort'
-          };
+        it('Should return with a successful connection message', function(done) {
+          function success(data) {
+            expect(data.authorized).to.equal(true);
+            expect(data.connected).to.equal(true);
+            done();
+          }
 
-          connection = telDCache.connect(options);
-        });
+          function failure() {
+            expect(true).to.equal(false);
+          }
 
-        describe('When I examine the state', function() {
-
-          it('Should return with a successful connection message', function(done) {
-            function success(data) {
-              expect(data.connected).to.equal(true);
-              done();
-            }
-
-            function failure() {
-              expect(true).to.equal(false);
-            }
-
-            connection.then(success, failure).catch(done);
-          });
-        });
-
-        describe('And I disconnect the cache session', function() {
-
-          var closePromise;
-
-          beforeEach(function() {
-            closePromise = connection.then(telDCache.disconnect);
-          });
-
-          it('Should return with a successful disconnect message rabbits', function(done) {
-
-            function success(data) {
-              expect(data.connected).to.equal(false);
-              done();
-            }
-
-            function failure() {
-              console.log('shit');
-              expect(true).to.equal(false);
-            }
-
-            closePromise.then(success, failure).catch(done);
-          });
+          connection.then(success, failure).catch(done);
         });
       });
-    });
+
+      describe('And I disconnect the cache session', function() {
+
+        var closePromise;
+
+        beforeEach(function() {
+          closePromise = connection.then(telDCache.disconnect);
+        });
+
+        it('Should return with a successful disconnect message', function(done) {
+
+          function success(data) {
+            expect(data.connected).to.equal(false);
+            done();
+          }
+
+          function failure() {
+            expect(true).to.equal(false);
+          }
+
+          closePromise.then(success, failure).catch(done);
+        });
+      });
+    }); // end 'connect to secured cache with a password'
+
+
+    describe('And I connect to the secured cache without a correct password', function () {
+
+      var connection; 
+
+      beforeEach(function() {
+        sinon.stub(redis, 'createClient', function stubCreateClientError() {
+          setTimeout(function() {
+            emitter.emit('error', {'message': 'There needs to be NOAUTH in this string'});
+          }, 250);
+          return stubRedisClient;
+        });
+
+        var options = {
+          host: 'someHost',
+          port: 'somePort',
+          password: null
+        };
+
+        connection = telDCache.connect(options);
+      });
+
+      afterEach(function() {
+        redis.createClient.restore();
+      });
+
+      describe('When I examine the state', function() {
+
+        it('Should return with an unsuccessful connection state', function(done) {
+          function successfulPasswordShouldntHappen(data) {
+            expect(true).to.equal(false);
+          }
+
+          function passwordIsWrong(data) {
+            expect(data.authorized).to.equal(false);
+            expect(data.connected).to.equal(false);
+            done();
+          }
+
+          connection.then(successfulPasswordShouldntHappen, passwordIsWrong).catch(done);
+        });
+      });
+
+      describe('And I disconnect the cache session', function() {
+
+        var closePromise;
+
+        beforeEach(function() {
+          closePromise = connection.then(telDCache.disconnect);
+        });
+
+        it('Should already be disconnected', function(done) {
+
+          function success(data) {
+            expect('run').to.equal('this should not');
+          }
+
+          function failure(data) {
+            expect(data.authorized).to.equal(false)
+            expect(data.connected).to.equal(false)
+            done();
+          }
+
+          closePromise.then(success, failure).catch(done);
+        });
+      });
+    }); // end 'connect without a correct password'
+
+
+
 
   });
 });
