@@ -2,19 +2,15 @@
 
 var chai = require('chai');
 var expect = chai.expect;
-//var chaiAsPromised = require('chai-as-promised');
-
-//chai.use(chaiAsPromised);
 
 var sinon = require('sinon');
 var redis = require('redis');
 var _ = require('lodash');
-var q = require('@telogical/telq');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
 
-var StubRedisClient = require('./mocks/stubRedisClient');;
+var StubRedisClient = require('./mocks/stubRedisClient');
 var stubRedisClient = new StubRedisClient(emitter);
 
 
@@ -75,7 +71,7 @@ describe('Given I have a module to cache data', function() {
       var testData = {
         'key': 'myTestKey',
         'value': 'myTestValue'
-      }
+      };
 
       var testHashData = {
         'key': 'myHash',
@@ -106,7 +102,7 @@ describe('Given I have a module to cache data', function() {
             done();
           }
 
-          function failure(err) {
+          function failure() {
             expect(true).to.equal(false);
           }
 

@@ -6,17 +6,19 @@ var expect = chai.expect;
 var sinon = require('sinon');
 var redis = require('redis');
 var _ = require('lodash');
-var q = require('@telogical/telq');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
 
-var StubRedisClient = require('./mocks/stubRedisClient');;
+var StubRedisClient = require('./mocks/stubRedisClient');
 var stubRedisClient = new StubRedisClient(emitter);
 
 describe('Given I have a module to cache data', function() {
   var TelDCache = require('./../index.js');
   var telDCache;
+  var key = 'someKey';
+  var options = {};
+  var retrievePromise;
 
   describe('And I have instantiated it', function() {
     before(function () {
@@ -37,13 +39,10 @@ describe('Given I have a module to cache data', function() {
 
     describe('And I have not connected to the cache', function() {
       describe('When I attempt to retrieve data from the cache', function() {
-        var retrievePromise,
-            expectedError;
+        var expectedError = 'Cache is not connected';
 
         beforeEach(function() {
-          var key = 'someKey',
-              expectedError = 'Cache is not connected',
-              options = {};
+          retrievePromise = telDCache.retrieve(key);
         });
 
         it('Should reject with an error', function(done) {
@@ -52,39 +51,82 @@ describe('Given I have a module to cache data', function() {
           }
 
           function notConnectedReject(errorMessage) {
-            expect(errorMessage).to.equal(expectedError);
+            console.log(errorMessage, typeof errorMessage);
+            expect(errorMessage.message).to.equal(expectedError);
             done();
           }
 
-          done();
+          retrievePromise.then(notConnectedResolve, notConnectedReject)
+            .catch(done);
         });
 
       }); // end 'when I attempt to retrieve data from the cache
 
     }); // end 'have not connected to the cache'
 
-    //describe('And I have connected to the cache', function() {
-      //var key = 'yetAnotherKey';
+    describe('And I have connected to the cache', function() {
 
-      //describe('And I attempt to retrieve a key that does not exist in the cache', function() {
-        //var expectedErrorMessage = 'Key does not exist';
+      describe('And the key does not exist in the cache', function() {
+        describe('When I retrieve the key', function() {
+          var expectedErrorMessage = 'Key does not exist';
 
-        //beforeEach(function() {
+          beforeEach(function() {
+            telDCache.connect(options);
+            telDCache._state.connected = true;
 
-        //});
-      //});
+            retrievePromise = telDCache.retrieve(key);
+          });
 
+          it('Should reject with an error', function(done) {
+            function noKeyResolve() {
+              expect('not run').to.equal('this should');
+            }
 
-      //describe('And that key represents a string value', function() {
-        //var expectedValue = 'I am what redis might return';
-      //});
+            function noKeyReject(errorMessage) {
+              expect(expectedErrorMessage).to.equal(errorMessage);
+              done();
+            }
+
+            retrievePromise.then(noKeyResolve, noKeyReject)
+              .catch(done);
+          });
+        });
+      });
+
+      describe('And that key represents a string value', function() {
+        var expectedValue = 'I am what redis might return';
+
+        var stringOptions = {
+          'typeHint': 'string'
+        };
+
+        beforeEach(function() {
+          telDCache.connect(options);
+          telDCache._state.connected = true;
+
+          retrievePromise = telDCache.retrieve(key, stringOptions);
+        });
+
+        it('Should return a string', function(done) {
+          function stringResolve(returnedValue) {
+            expect(returnedValue).to.equal(expectedValue);
+            done();
+          }
+
+          function stringReject() {
+            expect('not run').to.equal('should not');
+          }
+
+          retrievePromise.then(stringResolve, stringReject).catch(done);
+        });
+      });
 
       //describe('And I have a hash key to retrieve with the primary key', function() {
         //var hashKey = 'subKey';
         //var expectedValue = 'I am an expected hash value from redis';
       //});
 
-    //});
+    });
 
   }); // end 'And I have instantiated it'
 
