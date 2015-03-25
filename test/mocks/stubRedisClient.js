@@ -13,7 +13,7 @@ function StubRedisClient(emitter) {
   }
 
   function get(key, cb) {
-    cb();
+    cb(null, null);
   }
 
   function hset(key, value, cb) {
@@ -24,8 +24,8 @@ function StubRedisClient(emitter) {
     cb(null, 0);
   }
 
-  function hmget(key, cb) {
-    cb();
+  function hgetall(key, cb) {
+    cb(null, null);
   }
 
   function end() {
@@ -38,7 +38,7 @@ function StubRedisClient(emitter) {
   this.set = set;
   this.hset = hset;
   this.hmset = hmset;
-  this.hmget = hmget;
+  this.hgetall = hgetall;
   this.end = end;
 }
 

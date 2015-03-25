@@ -66,14 +66,28 @@ describe('Given I have a module to cache data', function() {
 
     describe('And I have connected to the cache', function() {
 
+      beforeEach(function() {
+        telDCache.connect(options);
+        telDCache._state.connected = true;
+      });
+
       describe('And the key does not exist in the cache', function() {
+        function missingKeyStub(key, cb) {
+          cb(null, null);
+        }
+
+        beforeEach(function() {
+          sinon.stub(stubRedisClient, 'get', missingKeyStub);
+        });
+
+        afterEach(function() {
+          stubRedisClient.get.restore();
+        });
+
         describe('When I retrieve the key', function() {
           var expectedErrorMessage = 'Key does not exist';
 
           beforeEach(function() {
-            telDCache.connect(options);
-            telDCache._state.connected = true;
-
             retrievePromise = telDCache.retrieve(key);
           });
 
@@ -82,8 +96,8 @@ describe('Given I have a module to cache data', function() {
               expect('not run').to.equal('this should');
             }
 
-            function noKeyReject(errorMessage) {
-              expect(expectedErrorMessage).to.equal(errorMessage);
+            function noKeyReject(error) {
+              expect(expectedErrorMessage).to.equal(error.message);
               done();
             }
 
@@ -96,37 +110,86 @@ describe('Given I have a module to cache data', function() {
       describe('And that key represents a string value', function() {
         var expectedValue = 'I am what redis might return';
 
-        var stringOptions = {
-          'typeHint': 'string'
-        };
+        function getKeyValueStub(key, cb) {
+          cb(null, expectedValue);
+        }
 
         beforeEach(function() {
-          telDCache.connect(options);
-          telDCache._state.connected = true;
-
-          retrievePromise = telDCache.retrieve(key, stringOptions);
+          sinon.stub(stubRedisClient, 'get', getKeyValueStub);
         });
 
-        it('Should return a string', function(done) {
-          function stringResolve(returnedValue) {
-            expect(returnedValue).to.equal(expectedValue);
-            done();
-          }
-
-          function stringReject() {
-            expect('not run').to.equal('should not');
-          }
-
-          retrievePromise.then(stringResolve, stringReject).catch(done);
+        afterEach(function() {
+          stubRedisClient.get.restore();
         });
-      });
 
-      //describe('And I have a hash key to retrieve with the primary key', function() {
-        //var hashKey = 'subKey';
-        //var expectedValue = 'I am an expected hash value from redis';
-      //});
+        describe('When I retrieve the value', function() {
+          beforeEach(function() {
+            retrievePromise = telDCache.retrieve(key);
+          });
 
-    });
+          it('Should return a string', function(done) {
+            function stringResolve(returnedValue) {
+              expect(returnedValue).to.equal(expectedValue);
+              done();
+            }
+
+            function stringReject() {
+              expect('not run').to.equal('this should');
+            }
+
+            retrievePromise.then(stringResolve, stringReject).catch(done);
+          });
+        });
+
+      }); // end 'and that key represents a string value'
+
+      describe('And that key represents an object', function() {
+        var expectedObject = {
+          'this': 'is what',
+          'redis': 'might return'
+        };
+
+        var objectRetrieveOptions = {
+          'typeHint': 'object'
+        };
+
+        function getObjectValueStub(key, cb) {
+          cb(null, expectedObject);
+        }
+
+        beforeEach(function() {
+          sinon.stub(stubRedisClient, 'hgetall', getObjectValueStub);
+        });
+
+        afterEach(function() {
+          stubRedisClient.hgetall.restore();
+        });
+
+        describe('When I retrieve the value', function() {
+
+          beforeEach(function() {
+            retrievePromise = telDCache.retrieve(key, objectRetrieveOptions);
+          });
+
+          it('Should return an object', function(done) {
+            function objectResolved(returnedObject) {
+              expect(returnedObject).to.deep.equal(expectedObject);
+              done();
+            }
+
+            function objectRejected(someObject) {
+              console.log('a thing was rejected', someObject);
+              expect('not run').to.equal('this should');
+            }
+
+            retrievePromise.then(objectResolved, objectRejected).catch(done);
+          });
+
+        });
+
+      }); // end 'And that key represents an object'
+
+    }); // end 'I have connected to the cache'
 
   }); // end 'And I have instantiated it'
 
