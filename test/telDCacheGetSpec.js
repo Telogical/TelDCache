@@ -51,7 +51,6 @@ describe('Given I have a module to cache data', function() {
           }
 
           function notConnectedReject(errorMessage) {
-            console.log(errorMessage, typeof errorMessage);
             expect(errorMessage.message).to.equal(expectedError);
             done();
           }
@@ -178,7 +177,6 @@ describe('Given I have a module to cache data', function() {
             }
 
             function objectRejected(someObject) {
-              console.log('a thing was rejected', someObject);
               expect('not run').to.equal('this should');
             }
 
