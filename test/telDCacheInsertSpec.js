@@ -6,6 +6,7 @@ var expect = chai.expect;
 var sinon = require('sinon');
 var redis = require('redis');
 var _ = require('lodash');
+var telDCache = require('./../index.js');
 
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
@@ -17,13 +18,10 @@ var stubRedisClient = new StubRedisClient(emitter);
 // If these tests fail due to timeout you may need to adjust the setTimeout
 // calls made in the beforeEach()s that use it.
 describe('Given I have a module to cache data', function() {
-  var TelDCache = require('./../index.js');
-  var telDCache;
 
   describe('And I have instantiated it', function() {
     before(function() {
       sinon.stub(redis, 'createClient').returns(stubRedisClient);
-      telDCache = new TelDCache();
     });
 
     after(function() {
@@ -39,6 +37,11 @@ describe('Given I have a module to cache data', function() {
     });
 
     describe('And I have not connected to the cache', function() {
+
+      beforeEach(function() {
+        telDCache._state.connected = false;
+      });
+
       describe('When I insert data to the cache', function() {
         var insertPromise,
             expectedError;
