@@ -7,6 +7,7 @@ var sinon = require('sinon');
 var redis = require('redis');
 var _ = require('lodash');
 
+var telDCache = require('./../index.js');
 var EventEmitter = require('events').EventEmitter;
 var emitter = new EventEmitter();
 
@@ -14,8 +15,6 @@ var StubRedisClient = require('./mocks/stubRedisClient');
 var stubRedisClient = new StubRedisClient(emitter);
 
 describe('Given I have a module to cache data', function() {
-  var TelDCache = require('./../index.js');
-  var telDCache;
   var key = 'someKey';
   var options = {};
   var retrievePromise;
@@ -23,7 +22,6 @@ describe('Given I have a module to cache data', function() {
   describe('And I have instantiated it', function() {
     before(function () {
       sinon.stub(redis, 'createClient').returns(stubRedisClient);
-      telDCache = new TelDCache();
     });
 
     after(function() {
@@ -176,7 +174,7 @@ describe('Given I have a module to cache data', function() {
               done();
             }
 
-            function objectRejected(someObject) {
+            function objectRejected() {
               expect('not run').to.equal('this should');
             }
 
