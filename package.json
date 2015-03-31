@@ -1,6 +1,6 @@
 {
   "name": "@telogical/teldcache",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A durable caching implementation built upon TelQ and Redis (current implementation).",
   "repository": {
     "type": "git",
