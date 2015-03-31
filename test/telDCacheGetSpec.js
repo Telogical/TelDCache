@@ -155,11 +155,11 @@ describe('Given I have a module to cache data', function() {
         }
 
         beforeEach(function() {
-          sinon.stub(stubRedisClient, 'hgetall', getObjectValueStub);
+          sinon.stub(stubRedisClient, 'get', getObjectValueStub);
         });
 
         afterEach(function() {
-          stubRedisClient.hgetall.restore();
+          stubRedisClient.get.restore();
         });
 
         describe('When I retrieve the value', function() {
