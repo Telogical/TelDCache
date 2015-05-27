@@ -38,14 +38,14 @@
   },
   "dependencies": {
     "@telogical/telq": "^1.0.1",
-    "gulp": "^3.8.11",
-    "lodash": "^3.3.1",
+    "lodash": "3.3.x",
     "redis": "^0.12.1"
   },
   "devDependencies": {
     "chai": "^2.1.0",
     "chai-as-promised": "^4.3.0",
     "chalk": "*",
+    "gulp": "3.8.x",
     "gulp-concat": "^2.5.2",
     "gulp-jshint": "^1.9.2",
     "gulp-mocha": "^2.0.0",
